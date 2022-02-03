@@ -229,6 +229,8 @@ const (
 	REST  = "REST"
 	MQTT  = "MQTT"
 	EMAIL = "EMAIL"
+	SMS   = "SMS"      //add by edgeGo
+	DINGDING = "DINGDING" //add by edgeGo
 )
 
 // Constants for SMA Operation Action
