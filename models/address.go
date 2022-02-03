@@ -99,7 +99,6 @@ type DingdingAddress struct {
 	Secret      string
 }
 
-
 func (a RESTAddress) GetBaseAddress() BaseAddress { return a.BaseAddress }
 
 // MQTTPubAddress is a MQTT specific struct
