@@ -12,7 +12,7 @@ import (
 )
 
 type Address struct {
-	Type string `json:"type" validate:"oneof='REST' 'MQTT' 'EMAIL'"`
+	Type string `json:"type" validate:"oneof='REST' 'MQTT' 'EMAIL' 'SMS' 'DINGDING'"`
 
 	Host string `json:"host" validate:"required_unless=Type EMAIL"`
 	Port int    `json:"port" validate:"required_unless=Type EMAIL"`
