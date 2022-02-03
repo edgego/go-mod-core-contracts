@@ -15,7 +15,8 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/v2/models"
 )
 
-var supportedChannelTypes = []string{common.EMAIL, common.REST}
+//add SMS,DINGDING type by edgeGo
+var supportedChannelTypes = []string{common.EMAIL, common.REST, common.SMS, common.DINGDING}
 
 // AddSubscriptionRequest defines the Request Content for POST Subscription DTO.
 // This object and its properties correspond to the AddSubscriptionRequest object in the APIv2 specification:
