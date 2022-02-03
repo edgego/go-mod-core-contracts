@@ -17,9 +17,11 @@ type Address struct {
 	Host string `json:"host" validate:"required_unless=Type EMAIL"`
 	Port int    `json:"port" validate:"required_unless=Type EMAIL"`
 
-	RESTAddress    `json:",inline" validate:"-"`
-	MQTTPubAddress `json:",inline" validate:"-"`
-	EmailAddress   `json:",inline" validate:"-"`
+	RESTAddress     `json:",inline" validate:"-"`
+	MQTTPubAddress  `json:",inline" validate:"-"`
+	EmailAddress    `json:",inline" validate:"-"`
+	SmsAddress      `json:",inline" validate:"-"` //add by edgeGO
+	DingdingAddress `json:",inline" validate:"-"` //add by edgeGO
 }
 
 // Validate satisfies the Validator interface
@@ -34,16 +36,31 @@ func (a *Address) Validate() error {
 		if err != nil {
 			return errors.NewCommonEdgeX(errors.KindContractInvalid, "invalid RESTAddress.", err)
 		}
+		break
 	case common.MQTT:
 		err = common.Validate(a.MQTTPubAddress)
 		if err != nil {
 			return errors.NewCommonEdgeX(errors.KindContractInvalid, "invalid MQTTPubAddress.", err)
 		}
+		break
 	case common.EMAIL:
 		err = common.Validate(a.EmailAddress)
 		if err != nil {
 			return errors.NewCommonEdgeX(errors.KindContractInvalid, "invalid EmailAddress.", err)
 		}
+		break
+	case common.SMS: //add by edgeGO
+		err = common.Validate(a.SmsAddress)
+		if err != nil {
+			return errors.NewCommonEdgeX(errors.KindContractInvalid, "invalid SmsAddress.", err)
+		}
+		break
+	case common.DINGDING: //add by edgeGO
+		err = common.Validate(a.DingdingAddress)
+		if err != nil {
+			return errors.NewCommonEdgeX(errors.KindContractInvalid, "invalid DingdingAddress.", err)
+		}
+		break
 	}
 
 	return nil
@@ -51,7 +68,7 @@ func (a *Address) Validate() error {
 
 type RESTAddress struct {
 	Path       string `json:"path,omitempty"`
-	HTTPMethod string `json:"httpMethod,omitempty" validate:"required,oneof='GET' 'HEAD' 'POST' 'PUT' 'PATCH' 'DELETE' 'TRACE' 'CONNECT'"`
+	HTTPMethod string `json:"httpMethod,omitempty" validate:"required,oneof='GET' 'HEAD' 'POST' 'PUT' 'DELETE' 'TRACE' 'CONNECT'"`
 }
 
 func NewRESTAddress(host string, port int, httpMethod string) Address {
@@ -91,6 +108,38 @@ type EmailAddress struct {
 	Recipients []string `json:"recipients,omitempty" validate:"gt=0,dive,email"`
 }
 
+//add by edgeGO
+type DingdingAddress struct {
+	AccessToken string `json:"accessToken,omitempty" validate:"gt=0,dive,dingding"`
+	Secret      string `json:"secret,omitempty" validate:"gt=0,dive,dingding"`
+}
+
+//add by edgeGO
+type SmsAddress struct {
+	Recipients []string `json:"recipients,omitempty" validate:"gt=0,dive,sms"`
+}
+
+//add by edgeGO
+func NewSmsAddress(recipients []string) Address {
+	return Address{
+		Type: common.SMS,
+		SmsAddress: SmsAddress{
+			Recipients: recipients,
+		},
+	}
+}
+
+//add by edgeGO
+func NewDingdingAddress(accessToken string, secret string) Address {
+	return Address{
+		Type: common.DINGDING,
+		DingdingAddress: DingdingAddress{
+			AccessToken: accessToken,
+			Secret:      secret,
+		},
+	}
+}
+
 func NewEmailAddress(recipients []string) Address {
 	return Address{
 		Type: common.EMAIL,
@@ -112,6 +161,7 @@ func ToAddressModel(a Address) models.Address {
 			Path:       a.RESTAddress.Path,
 			HTTPMethod: a.RESTAddress.HTTPMethod,
 		}
+		break
 	case common.MQTT:
 		address = models.MQTTPubAddress{
 			BaseAddress: models.BaseAddress{
@@ -125,12 +175,28 @@ func ToAddressModel(a Address) models.Address {
 			AutoReconnect:  a.AutoReconnect,
 			ConnectTimeout: a.ConnectTimeout,
 		}
+		break
 	case common.EMAIL:
 		address = models.EmailAddress{
 			BaseAddress: models.BaseAddress{
 				Type: a.Type,
 			},
 			Recipients: a.EmailAddress.Recipients,
+		}
+	case common.SMS: //add by edgeGO
+		address = models.SmsAddress{
+			BaseAddress: models.BaseAddress{
+				Type: a.Type,
+			},
+			Recipients: a.SmsAddress.Recipients,
+		}
+	case common.DINGDING: //add by edgeGO
+		address = models.DingdingAddress{
+			BaseAddress: models.BaseAddress{
+				Type: a.Type,
+			},
+			AccessToken: a.DingdingAddress.AccessToken,
+			Secret:      a.DingdingAddress.Secret,
 		}
 	}
 	return address
@@ -149,6 +215,7 @@ func FromAddressModelToDTO(address models.Address) Address {
 			Path:       a.Path,
 			HTTPMethod: a.HTTPMethod,
 		}
+		break
 	case models.MQTTPubAddress:
 		dto.MQTTPubAddress = MQTTPubAddress{
 			Publisher:      a.Publisher,
@@ -159,10 +226,23 @@ func FromAddressModelToDTO(address models.Address) Address {
 			AutoReconnect:  a.AutoReconnect,
 			ConnectTimeout: a.ConnectTimeout,
 		}
+		break
 	case models.EmailAddress:
 		dto.EmailAddress = EmailAddress{
 			Recipients: a.Recipients,
 		}
+		break
+	case models.SmsAddress: //add by edgeGO
+		dto.SmsAddress = SmsAddress{
+			Recipients: a.Recipients,
+		}
+		break
+	case models.DingdingAddress: //add by edgeGO
+		dto.DingdingAddress = DingdingAddress{
+			AccessToken: a.AccessToken,
+			Secret:      a.Secret,
+		}
+		break
 	}
 	return dto
 }
