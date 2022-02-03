@@ -51,6 +51,18 @@ func unmarshalAddress(b []byte) (address Address, err error) {
 			return address, errors.NewCommonEdgeX(errors.KindContractInvalid, "Failed to unmarshal Email address.", err)
 		}
 		address = mail
+	case common.SMS: //add bu edgeGo
+		var sms SmsAddress
+		if err = json.Unmarshal(b, &sms); err != nil {
+			return address, errors.NewCommonEdgeX(errors.KindContractInvalid, "Failed to unmarshal Sms address.", err)
+		}
+		address = sms
+	case common.DINGDING: //add bu edgeGo
+		var dingding DingdingAddress
+		if err = json.Unmarshal(b, &dingding); err != nil {
+			return address, errors.NewCommonEdgeX(errors.KindContractInvalid, "Failed to unmarshal Dingding address.", err)
+		}
+		address = dingding
 	default:
 		return address, errors.NewCommonEdgeX(errors.KindContractInvalid, "Unsupported address type", err)
 	}
@@ -73,6 +85,20 @@ type RESTAddress struct {
 	Path       string
 	HTTPMethod string
 }
+
+// SmsAddress is an Sms specific struct,add by edgeGo
+type SmsAddress struct {
+	BaseAddress
+	Recipients []string
+}
+
+// DingdingAddress is an Sms specific struct,add by edgeGo
+type DingdingAddress struct {
+	BaseAddress
+	AccessToken string
+	Secret      string
+}
+
 
 func (a RESTAddress) GetBaseAddress() BaseAddress { return a.BaseAddress }
 
@@ -97,3 +123,9 @@ type EmailAddress struct {
 }
 
 func (a EmailAddress) GetBaseAddress() BaseAddress { return a.BaseAddress }
+
+// SmsAddress is an Sms specific struct,add by edgeGo
+func (a SmsAddress) GetBaseAddress() BaseAddress { return a.BaseAddress }
+
+// DingdingAddress is an Sms specific struct,add by edgeGo
+func (a DingdingAddress) GetBaseAddress() BaseAddress { return a.BaseAddress }
