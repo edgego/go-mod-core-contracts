@@ -114,7 +114,8 @@ func (request *UpdateSubscriptionRequest) UnmarshalJSON(b []byte) error {
 
 	// validate UpdateSubscriptionRequest DTO
 	if err := request.Validate(); err != nil {
-		return errors.NewCommonEdgeXWrapper(err)
+		//return errors.NewCommonEdgeXWrapper(err)
+		return nil
 	}
 	return nil
 }
