@@ -14,8 +14,8 @@ import (
 type Address struct {
 	Type string `json:"type" validate:"oneof='REST' 'MQTT' 'EMAIL' 'SMS' 'DINGDING'"`
 
-	Host string `json:"host" validate:"required_unless=Type EMAIL SMS DINGDING"`
-	Port int    `json:"port" validate:"required_unless=Type EMAIL SMS DINGDING"`
+	Host string `json:"host" validate:"required_unless=Type EMAIL"`
+	Port int    `json:"port" validate:"required_unless=Type EMAIL"`
 
 	RESTAddress     `json:",inline" validate:"-"`
 	MQTTPubAddress  `json:",inline" validate:"-"`
@@ -110,13 +110,13 @@ type EmailAddress struct {
 
 //add by edgeGO
 type DingdingAddress struct {
-	AccessToken string `json:"accessToken,omitempty" validate:"gt=0,dive,dingding"`
-	Secret      string `json:"secret,omitempty" validate:"gt=0,dive,dingding"`
+	AccessToken string `json:"accessToken,omitempty"`
+	Secret      string `json:"secret,omitempty"`
 }
 
 //add by edgeGO
 type SmsAddress struct {
-	Recipients []string `json:"recipients,omitempty" validate:"gt=0,dive,sms"`
+	Recipients []string `json:"recipients,omitempty" validate:"gt=0,dive"`
 }
 
 //add by edgeGO
